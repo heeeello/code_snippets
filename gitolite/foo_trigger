@@ -1,0 +1,84 @@
+#!/bin/bash
+
+#set -x
+
+# ENV description:
+# Created git2@localhost2 for gitolite setup. 
+# Manually add git2 pub key to .ssh/authorized_keys in order to clone localhost repo
+# set this file as POST_CREATE trigger
+
+# Purpose of this file:
+# Automatically add README.md for repo
+# Enable cgit integration
+
+
+GIT_SERVER_URI="git2@localhost"
+PROJECTS_WITH_DOC="$HOME/repositories/projects_with_doc.list"
+
+
+TEMP_LOG="/tmp/log.txt"
+env > $TEMP_LOG
+echo "params: $@" >> $TEMP_LOG
+
+# Clone bare repo and add readme
+function add_readme()
+{
+  # get repo working dir
+  git clone $GIT_SERVER_URI:$repo
+  cd $repo
+  mkdir -p docs
+  cp -f $HOME/templates/README.md.template docs/README.md
+  cp -f $HOME/templates/faq.md.template docs/faq.md
+
+  # push changes to central repo
+  push_repo
+
+  # clean  output
+  rm -rf .git docs
+  cd ..
+  rmdir $repo
+}
+
+# Push to remote bare repo
+function push_repo()
+{
+  OLD_GIT_DIR=$GIT_DIR
+  GIT_DIR=".git"
+  git add --all
+  git commit -a -m "add README.md"
+  git push origin master
+  GIT_DIR=$OLD_GIT_DIR
+}
+
+
+if [[ $GL_OPTION_DOC == "true" ]];then
+
+  repo=$2
+  echo "Add docs to repo:$repo"
+
+  cd /tmp
+  add_readme
+
+  # Add to project-list for cgit to scan
+  repo_name=${repo%%.git} 
+  # If without .git suffix
+  if [[ "$repo_name" == "$repo" ]];then
+    repo_dir_name=${repo}.git
+  else
+    repo_dir_name=$repo
+  fi
+  echo ${repo_dir_name} >>  $PROJECTS_WITH_DOC
+
+  
+  # Add cgit config to bare repo for cgit to scan
+  cd $HOME/repositories/$repo_dir_name
+  git config --add cgit.url "$repo"
+  git config --add cgit.name  "$repo"
+  git config --add cgit.clone-url "$GIT_SERVER_URI:$repo"
+  git config --add cgit.desc "$repo git repository"
+   
+
+  echo "Successfully add default doc to repo:$repo"
+
+fi
+
