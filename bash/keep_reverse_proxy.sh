@@ -9,16 +9,18 @@ LDAP_HOST=${LDAP_HOST_IP}
 count=0
 MAX_RETRIES=1000
 
-PROXY_PORT
 
 while true; do
   PORT=389
+
+  # Try to kill remote listening 389 port process first
+  ssh $EXT_HOST "fuser -k -n tcp 389"
+  sleep 3;
 
   echo "connectting to $EXT_HOST:$PORT at `date`";
   ssh -NR  $PORT:$LDAP_HOST:389  $EXT_HOST;
 
   echo "connection to $EXT_HOST:$PORT closed at `date`";
-  sleep 3;
 
   let count=count+1
   if [[  count -ge $MAX_RETRIES ]]; then
