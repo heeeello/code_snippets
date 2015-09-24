@@ -1,8 +1,8 @@
 #!/bin/bash -x
 
 # Let this autostart
-# Change server side /etc/ssh/sshd_config, TCPKeepAlive  yes
-# Change client side /etc/ssh/ssh_config,  ExitOnForwardFailure yes
+# Change server side /etc/ssh/sshd_config, TCPKeepAlive  yes, ClientAliveInterval 60, ClientAliveCountMax 3
+# Change client side /etc/ssh/ssh_config,  ExitOnForwardFailure yes, ServerAliveInterval 60
 
 EXT_HOST=${EXT_HOST_IP}
 LDAP_HOST=${LDAP_HOST_IP}
