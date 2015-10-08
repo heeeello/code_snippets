@@ -1,9 +1,10 @@
 #!/bin/bash -x
 
-# Let this autostart
+# Let this autostart. nohup it > /var/log/keep.log 2>&1 &
 # Change server side /etc/ssh/sshd_config, TCPKeepAlive  yes, ClientAliveInterval 60, ClientAliveCountMax 3
 # Change client side /etc/ssh/ssh_config,  ExitOnForwardFailure yes, ServerAliveInterval 60
 
+ME=$0
 EXT_HOST=${EXT_HOST_IP}
 LDAP_HOST=${LDAP_HOST_IP}
 count=0
@@ -15,12 +16,12 @@ while true; do
 
   # Try to kill remote listening 389 port process first
   ssh $EXT_HOST "fuser -k -n tcp 389"
-  sleep 3;
+  sleep 10;
 
-  echo "connectting to $EXT_HOST:$PORT at `date`";
+  echo "$ME: connectting to $EXT_HOST:$PORT for $count times at `date`";
   ssh -NR  $PORT:$LDAP_HOST:389  $EXT_HOST;
 
-  echo "connection to $EXT_HOST:$PORT closed at `date`";
+  echo "$ME: connection to $EXT_HOST:$PORT closed at `date`";
 
   let count=count+1
   if [[  count -ge $MAX_RETRIES ]]; then
