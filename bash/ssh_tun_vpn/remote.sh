@@ -1,5 +1,5 @@
 
-. vars.sh
+. vars
 
 ifconfig $TUN_NAME up
 ip addr add dev $TUN_NAME $TUN_PEER_IP

@@ -31,3 +31,7 @@ Local machine:
    ip route add default via 10.10.11.2 dev tun3
    ip route add <your remote ip> via 192.168.1.1 dev eth7
 
+4. Possibly add SNAT masquerade on remote machines external IF
+Remote machine:
+   iptables -t nat -A POSTROUTING -o $EXTERNAL_IF -j SNAT --to-source EXTERNAL_IP
+   
