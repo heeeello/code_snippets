@@ -1,5 +1,26 @@
 
 ## How to create a simple vpn using ssh tun forwarding
+Preparation:
+1. First permit tunnel on remote server.
+In sshd_config:
+PermitTunnel yes
+
+And restart sshd
+
+2. ssh-keygen and put id_rsa.pub to your remote host's authorized_keys
+
+
+Steps:
+1. set up ssh tun forward
+ssh -f -w 3:3  <your remote ip> true
+
+2. change vars according to your internal and external config
+
+3. run  ./keep_vpn.sh and the vpn should be running 
+
+
+
+## How it works
 
 0. First permit tunnel on remote server.
 In sshd_config:
